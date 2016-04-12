@@ -4,6 +4,7 @@
 //
 //  Created by Corey Baker on 4/11/16.
 //  Copyright © 2016 University of California San Diego - ECE 158B. All rights reserved.
+//  Followed and made additions to original tutorial by Gabriel Theodoropoulos - http://www.appcoda.com/intro-multipeer-connectivity-framework-ios-programming/
 //
 
 import UIKit
