@@ -12,6 +12,7 @@ import MultipeerConnectivity
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, MPCManagerDelegate {
     
+    // Declare app delegation object
     let appDelagate = UIApplication.sharedApplication().delegate as! AppDelegate
     var isAdvertising: Bool!
     

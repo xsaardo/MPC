@@ -9,7 +9,7 @@
 
 import MultipeerConnectivity
 
-
+// protocol for implementing delegation pattern, declare all delegate methods
 protocol MPCManagerDelegate {
     func foundPeer()
     
@@ -20,16 +20,21 @@ protocol MPCManagerDelegate {
     func connectedWithPeer(peerID: MCPeerID)
 }
 
-
+// Inherit from delegate protocol classes
 class MPCManager: NSObject, MCSessionDelegate, MCNearbyServiceBrowserDelegate, MCNearbyServiceAdvertiserDelegate {
     
+    // delegate object
     var delegate:MPCManagerDelegate?
+    
+    // MPC classes/objects needed
     var session: MCSession!
     var peer: MCPeerID!
     var browser: MCNearbyServiceBrowser!
     var advertiser: MCNearbyServiceAdvertiser!
-    var foundPeers = [MCPeerID]()
-    var invitationHandler: ((Bool, MCSession) ->Void)!
+    
+    // More Variables
+    var foundPeers = [MCPeerID]() // stores array of found peers
+    var invitationHandler: ((Bool, MCSession) ->Void)! // Completion handler declaration
     
     
     override init(){
@@ -37,27 +42,33 @@ class MPCManager: NSObject, MCSessionDelegate, MCNearbyServiceBrowserDelegate, M
         super.init()
         
         //Initialize variables 
-        peer = MCPeerID(displayName: UIDevice.currentDevice().name)
-        //session = MCSession(peer: peer, securityIdentity: [myIdentity], encryptionPreference: MCEncryptionPreference.Required)
-        session = MCSession(peer: peer)
-        session.delegate = self
+        peer = MCPeerID(displayName: UIDevice.currentDevice().name) // Initialize display name as device name
         
-        browser = MCNearbyServiceBrowser(peer: peer, serviceType: kAppName)
+        //session = MCSession(peer: peer, securityIdentity: [myIdentity], encryptionPreference: MCEncryptionPreference.Required)
+        
+        session = MCSession(peer: peer) // Initialize session object
+        session.delegate = self // Make our class the delegate of session object
+        
+        browser = MCNearbyServiceBrowser(peer: peer, serviceType: kAppName) // serviceType uniquely identifies the app
         browser.delegate = self
         
         //TODO: When need to add new information to advertiser. Stop it, and reinitialize
-        advertiser = MCNearbyServiceAdvertiser(peer: peer, discoveryInfo: nil, serviceType: kAppName)
+        advertiser = MCNearbyServiceAdvertiser(peer: peer, discoveryInfo: nil, serviceType: kAppName) // discoveryInfo is a dictionary of extra information to pass to peers upon discovery
         advertiser.delegate = self
     
     }
     
-    //Delagete methods
+    //Delegate methods
+    
+    // Called when nearby peer is found, checks is peer already exists in database then calls foundPeer delegate method
     func browser(browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
         
         var peerAlreadyInBrowser = false
         
         //TODO: All discover information for a specific peer will be here. Need to pass it to the foundPeer delegate
         //TODO LATER: Implement faster search function to find peers and remove
+        
+        // check foundPeers array if found peer exists already
         for (index, aPeer) in foundPeers.enumerate()
         {
             if aPeer == peerID{
@@ -74,6 +85,7 @@ class MPCManager: NSObject, MCSessionDelegate, MCNearbyServiceBrowserDelegate, M
         delegate?.foundPeer()
     }
     
+    // Called when a nearby peer is no longer discoverable
     func browser(browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         for (index, aPeer) in foundPeers.enumerate()
         {
